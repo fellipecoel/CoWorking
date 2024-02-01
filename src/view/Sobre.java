@@ -9,12 +9,18 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
+import java.awt.Rectangle;
 
 public class Sobre extends JDialog {
 	public Sobre() {
+		setTitle("Sobre");
+		setBounds(new Rectangle(100, 100, 613, 405));
 		setResizable(false);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		
+		//Será explicado ainda hoje, após criamos outra janela
 		setModal(true);
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Sobre.class.getResource("/img/logo.png")));
 		getContentPane().setFont(new Font("Trebuchet MS", Font.BOLD, 14));
 		getContentPane().setForeground(new Color(255, 255, 255));
