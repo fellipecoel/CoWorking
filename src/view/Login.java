@@ -2,6 +2,8 @@ package view;
 
 import javax.swing.JDialog;
 import java.awt.Toolkit;
+import java.awt.event.WindowEvent;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -17,7 +19,17 @@ import java.awt.Color;
 public class Login extends JDialog {
 	private JTextField inputLogin;
 	private JPasswordField inputSenha;
+	private JLabel imgDatabase;
+	
+	
 	public Login() {
+		addwindowListerner(new windowAdapter() {
+			public void windowActivated(WindowEvent e) {
+				statusConexaoBanco();
+			}
+		});
+		}
+	
 		getContentPane().setBackground(new Color(255, 255, 255));
 		setTitle("Login");
 		setResizable(false);
@@ -61,6 +73,24 @@ public class Login extends JDialog {
 		getContentPane().add(imgDatabase);
 	}
 
+	DAO dao = new DAO();
+	
+	private void statusConexaoBanco() {
+		try {
+			Connection conexaoBannco = dao.conectar();
+			
+			if (conexaoBanco == null) {
+				//Escolher a imagem
+				imgDatabase.setIcon(new ImageIcon (Login.class.getResource("/img/dataBaseOff.png"))); 
+			}
+			else {
+				imgDatabase.setIcon(new ImageIcon (Login.class.getResource("/img/dataBaseOn.png")));
+			}
+		
+	}
+	
+	
+	
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
