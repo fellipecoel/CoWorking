@@ -75,7 +75,7 @@ public class Login extends JDialog {
 		btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnLogin.setBounds(228, 284, 114, 23);
 		getContentPane().add(btnLogin);
-		
+
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				logar();
@@ -115,73 +115,70 @@ public class Login extends JDialog {
 
 	}
 
-	    private void logar() {
-	    	String read = "select * from funcionario where login=?" 
-	         + "and senha=md5(?)";
-	    	         
-	    	
-	    	//Validação do login do usuário
-	    	 if (inputLogin.getText().isEmpty()) {
-	    		JOptionPane.showMessageDialog(null, "Login e/ou senha inválido");
-	    		inputLogin.requestFocus();
-	    	}
-	    	 
-	    	//Validação da senha do usuário
-	    	 else if (inputSenha.getPassword().length==0) {
-	    		 JOptionPane.showMessageDialog(null, "Senha do usuário obrigatório");
-		    		inputSenha.requestFocus(); 
-	    	 }
-	    	 
-	    	 else {
-	    		 
-	    	
-	    	
-	    	try {
-	    		//Estabelecer a conexão
-	    		Connection conexaoBanco = dao.conectar();
-	    	
-	    		//Preparar a execusão do script SQL
-	    		PreparedStatement executarSQL = conexaoBanco.prepareStatement(read);
-	    		
-	    		//Atribuir valores dde login e senha
-	    		//Substituir as interrogações ? ? pelo conteúdo da caixa de texto (input)
-	    		executarSQL.setString(1, inputLogin.getText());
-	    		executarSQL.setString(2, inputSenha.getText());
-	    		
-	    		//Excutar os comandos SQL e de acordo com o resultado liberar os recursos na tela
-	    		ResultSet resultadoExecucao = executarSQL.executeQuery();
-	    		
-	    		//Validação do funcionário (autenticação)
-	    		//resultadoExecucao.next() significa que o login e a senha existem, ou seja, correspondem
-	    		
-	    		if (resultadoExecucao.next()) {
-	    			
-	    		    Home Home = new Home();
-	    		    Home.setVisible(true);
-	    		    
-	    		    //Fechar a janela de Login assim que a janela Home abrir (automaticamente)
-	    		    dispose();
-	    		  }
-	    		
-	    		
-	    		else {
-	    			//Criar um alerta (pop-up) que informe ao usuário que login e/ou senha estão inválidos
-	    			JOptionPane.showMessageDialog(null, "Login e/ou senha inválido");
-	    			inputLogin.setText(null);
-	    			inputSenha.setText(null);
-	    			inputLogin.requestFocus();
-    		}
-	    		
-	    		//Fechamento da chave do bloco try
-	    		conexaoBanco.close();
-	    	}
-	    	catch (Exception e) {
-	    		System.out.println(e);
-	    	}
-	    }
-	    
-	     }
-	
+	private void logar() {
+		String read = "select * from funcionario where login=?" + "and senha=md5(?)";
+
+		// Validação do login do usuário
+		if (inputLogin.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Login do usuário obrigatório");
+			inputLogin.requestFocus();
+		}
+
+		// Validação da senha do usuário
+		else if (inputSenha.getPassword().length == 0) {
+			JOptionPane.showMessageDialog(null, "Senha do usuário obrigatório");
+			inputSenha.requestFocus();
+		}
+
+		else {
+
+			try {
+				// Estabelecer a conexão
+				Connection conexaoBanco = dao.conectar();
+
+				// Preparar a execusão do script SQL
+				PreparedStatement executarSQL = conexaoBanco.prepareStatement(read);
+
+				// Atribuir valores dde login e senha
+				// Substituir as interrogações ? ? pelo conteúdo da caixa de texto (input)
+				executarSQL.setString(1, inputLogin.getText());
+				executarSQL.setString(2, inputSenha.getText());
+
+				// Excutar os comandos SQL e de acordo com o resultado liberar os recursos na
+				// tela
+				ResultSet resultadoExecucao = executarSQL.executeQuery();
+
+				// Validação do funcionário (autenticação)
+				// resultadoExecucao.next() significa que o login e a senha existem, ou seja,
+				// correspondem
+
+				if (resultadoExecucao.next()) {
+
+					Home Home = new Home();
+					Home.setVisible(true);
+
+					// Fechar a janela de Login assim que a janela Home abrir (automaticamente)
+					dispose();
+				}
+
+				else {
+					// Criar um alerta (pop-up) que informe ao usuário que login e/ou senha estão
+					// inválidos
+					JOptionPane.showMessageDialog(null, "Login e/ou senha inválido");
+					inputLogin.setText(null);
+					inputSenha.setText(null);
+					inputLogin.requestFocus();
+				}
+
+				// Fechamento da chave do bloco try
+				conexaoBanco.close();
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+
+	}
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -189,8 +186,6 @@ public class Login extends JDialog {
 					Login dialog = new Login();
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.setVisible(true);
-					
-					
 
 				} catch (Exception e) {
 					e.printStackTrace();
