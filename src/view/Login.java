@@ -131,6 +131,10 @@ public class Login extends JDialog {
 	    		 JOptionPane.showMessageDialog(null, "Senha do usuário obrigatório");
 		    		inputSenha.requestFocus(); 
 	    	 }
+	    	 
+	    	 else {
+	    		 
+	    	
 	    	
 	    	try {
 	    		//Estabelecer a conexão
@@ -176,7 +180,7 @@ public class Login extends JDialog {
 	    	}
 	    }
 	    
-	    
+	     }
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
