@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import model.DAO;
+import view.Home;
 
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -116,7 +117,7 @@ public class Login extends JDialog {
 	}
 
 	private void logar() {
-		String read = "select * from funcionario where login=?" + "and senha=md5(?)";
+		String read = "select * from funcionario where login=? and senha=md5(?)";
 
 		// Validação do login do usuário
 		if (inputLogin.getText().isEmpty()) {
@@ -154,8 +155,13 @@ public class Login extends JDialog {
 
 				if (resultadoExecucao.next()) {
 
-					Home Home = new Home();
-					Home.setVisible(true);
+					Home home = new Home();
+					
+					
+					
+					home.txtUsuarioLogado.setText("Usuário: " + resultadoExecucao.getString(2));
+					home.setVisible(true);
+					
 
 					// Fechar a janela de Login assim que a janela Home abrir (automaticamente)
 					dispose();
@@ -172,6 +178,7 @@ public class Login extends JDialog {
 
 				// Fechamento da chave do bloco try
 				conexaoBanco.close();
+				
 			} catch (Exception e) {
 				System.out.println(e);
 			}
