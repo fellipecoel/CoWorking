@@ -1,6 +1,8 @@
 package view;
 
 import javax.swing.JDialog;
+
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,24 +15,21 @@ import java.sql.ResultSet;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import java.awt.Rectangle;
+import javax.swing.SwingConstants;
+
+import com.mysql.cj.protocol.x.SyncFlushDeflaterOutputStream;
 
 import Atxy2k.CustomTextField.RestrictedTextField;
 import model.DAO;
-import view.Home;
 
-import java.awt.EventQueue;
-import java.awt.Font;
-import javax.swing.JPasswordField;
-import java.awt.Rectangle;
 import javax.swing.JButton;
+import java.awt.Font;
 import java.awt.Cursor;
 import javax.swing.ImageIcon;
-import java.awt.Color;
 
 public class Login extends JDialog {
-	private JTextField inputLogin;
-	private JPasswordField inputSenha;
-	private JLabel imgDatabase;
 
 	public Login() {
 
@@ -46,36 +45,29 @@ public class Login extends JDialog {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/img/logo.png")));
 		getContentPane().setLayout(null);
 
-		getContentPane().setBackground(new Color(255, 255, 255));
-		setTitle("Login");
-		setResizable(false);
-		setBounds(new Rectangle(100, 100, 584, 374));
-		getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 15));
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/img/logo.png")));
-		getContentPane().setLayout(null);
-
 		JLabel txtLogin = new JLabel("Login");
-		txtLogin.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		txtLogin.setBounds(265, 57, 87, 20);
+		txtLogin.setHorizontalAlignment(SwingConstants.CENTER);
+		txtLogin.setBounds(0, 80, 146, 14);
 		getContentPane().add(txtLogin);
 
 		JLabel txtSenha = new JLabel("Senha");
-		txtSenha.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		txtSenha.setBounds(262, 150, 80, 32);
+		txtSenha.setHorizontalAlignment(SwingConstants.CENTER);
+		txtSenha.setBounds(0, 130, 146, 14);
 		getContentPane().add(txtSenha);
 
 		inputLogin = new JTextField();
-		inputLogin.setBounds(180, 88, 206, 20);
+		inputLogin.setBounds(132, 77, 195, 20);
 		getContentPane().add(inputLogin);
 		inputLogin.setColumns(10);
 
 		inputSenha = new JPasswordField();
-		inputSenha.setBounds(180, 193, 206, 20);
+		inputSenha.setBounds(132, 127, 195, 20);
 		getContentPane().add(inputSenha);
 
 		JButton btnLogin = new JButton("Entrar");
 		btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnLogin.setBounds(228, 284, 114, 23);
+		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnLogin.setBounds(181, 186, 89, 23);
 		getContentPane().add(btnLogin);
 
 		btnLogin.addActionListener(new ActionListener() {
@@ -85,66 +77,65 @@ public class Login extends JDialog {
 		});
 
 		JLabel tituloLogin = new JLabel("Acessar conta");
-		tituloLogin.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		tituloLogin.setBounds(228, 11, 221, 20);
+		tituloLogin.setFont(new Font("Tahoma", Font.BOLD, 14));
+		tituloLogin.setHorizontalAlignment(SwingConstants.CENTER);
+		tituloLogin.setBounds(0, 27, 424, 20);
 		getContentPane().add(tituloLogin);
 
 		imgDatabase = new JLabel("");
 		imgDatabase.setIcon(new ImageIcon(Login.class.getResource("/img/databaseOff.png")));
-		imgDatabase.setBounds(10, 265, 46, 59);
+		imgDatabase.setBounds(10, 171, 46, 95);
 		getContentPane().add(imgDatabase);
-		
-		//Acessar o botão "Entrar" com a tecla "Enter"
-		getRootPane().setDefaultButton(btnLogin);
-		
 
-		//validação dos campos utilizado a biblioteca Atxy2k
-		
-		//Validação do campo inputLogin
+		// Acessar o botão "Entrar" com a tecla "Enter"
+		getRootPane().setDefaultButton(btnLogin);
+
+		// Validação dos campos utilizando a biblioteca Atxy2k
+		// Validação do campo inputLogin
 		RestrictedTextField validarLogin = new RestrictedTextField(inputLogin,
 				"abcdefghijklmnopqrstuvwxyz0123456789_-.");
-		
-		//Determinar o uso de alguns caracteres especiais(_-.) e alfanuméricos
+
+		// Determinar o uso de alguns caracteres especiais (_ - .) e alfanuméricos
 		validarLogin.setOnlyCustomCharacters(true);
-		
-		
-		
-		
-		//Restringir a somente 20 caracteres  no campo login
+
+		// Limitar a somente 20 caracteres no campo login
 		validarLogin.setLimit(20);
-		
-		//Validação do campo inputSenha
+
+		// Validação do campo inputSenha
 		RestrictedTextField validarSenha = new RestrictedTextField(inputSenha);
-		
-		//Limitar a somente 15 caracteres no campo senha
+
+		// Limitar a somente 15 caracteres no campo senha
 		validarSenha.setLimit(15);
-		
-		
-		//Desativar a tecla espaço no campo senha
+
+		// Desativar a tecla espaço no campo senha (FALTA FAZER!)
 		
 		
 	}
 
 	DAO dao = new DAO();
+	private JTextField inputLogin;
+	private JPasswordField inputSenha;
+	private JLabel imgDatabase;
 
 	private void statusConexaoBanco() {
 		try {
 			Connection conexaoBanco = dao.conectar();
 
 			if (conexaoBanco == null) {
-				// Escolher a imagem
-				imgDatabase.setIcon(new ImageIcon(Login.class.getResource("/img/dataBaseOff.png")));
-			} else {
-				imgDatabase.setIcon(new ImageIcon(Login.class.getResource("/img/dataBaseOn.png")));
+				// Escolher a imagem para quando não há conexão
+				imgDatabase.setIcon(new ImageIcon(Login.class.getResource("/img/databaseOff.png")));
 			}
 
+			else {
+				// Trocar a imagem se houver conexão
+				imgDatabase.setIcon(new ImageIcon(Login.class.getResource("/img/databaseOn.png")));
+			}
 			conexaoBanco.close();
 		}
 
 		catch (Exception e) {
 			System.out.println(e);
 		}
-
 	}
 
 	private void logar() {
@@ -152,13 +143,13 @@ public class Login extends JDialog {
 
 		// Validação do login do usuário
 		if (inputLogin.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Login do usuário obrigatório");
+			JOptionPane.showMessageDialog(null, "Login do usuário obrigatório!");
 			inputLogin.requestFocus();
 		}
 
 		// Validação da senha do usuário
 		else if (inputSenha.getPassword().length == 0) {
-			JOptionPane.showMessageDialog(null, "Senha do usuário obrigatório");
+			JOptionPane.showMessageDialog(null, "Senha do usuário obrigatória!");
 			inputSenha.requestFocus();
 		}
 
@@ -171,29 +162,27 @@ public class Login extends JDialog {
 				// Preparar a execusão do script SQL
 				PreparedStatement executarSQL = conexaoBanco.prepareStatement(read);
 
-				// Atribuir valores dde login e senha
+				// Atribuir valores de login e senha
 				// Substituir as interrogações ? ? pelo conteúdo da caixa de texto (input)
 				executarSQL.setString(1, inputLogin.getText());
 				executarSQL.setString(2, inputSenha.getText());
 
-				// Excutar os comandos SQL e de acordo com o resultado liberar os recursos na
+				// Executar os comandos SQL e de acordo com o resultado liberar os recursos na
 				// tela
 				ResultSet resultadoExecucao = executarSQL.executeQuery();
 
 				// Validação do funcionário (autenticação)
 				// resultadoExecucao.next() significa que o login e a senha existem, ou seja,
 				// correspondem
-
 				if (resultadoExecucao.next()) {
 
 					Home home = new Home();
-					
-					
-					
-					home.txtUsuarioLogado.setText("Usuário: " + resultadoExecucao.getString(2));
 					home.setVisible(true);
-					
 
+					home.txtUsuarioLogado.setText("Usuário: " + resultadoExecucao.getString(2));
+					home.txtPerfilLogado.setText("Perfil: " + resultadoExecucao.getString(5));
+
+					
 					// Fechar a janela de Login assim que a janela Home abrir (automaticamente)
 					dispose();
 				}
@@ -201,20 +190,22 @@ public class Login extends JDialog {
 				else {
 					// Criar um alerta (pop-up) que informe ao usuário que login e/ou senha estão
 					// inválidos
-					JOptionPane.showMessageDialog(null, "Login e/ou senha inválido");
+
+					JOptionPane.showMessageDialog(null, "Login e/ou senha não está válidos!");
 					inputLogin.setText(null);
 					inputSenha.setText(null);
 					inputLogin.requestFocus();
+
 				}
 
-				// Fechamento da chave do bloco try
 				conexaoBanco.close();
-				
-			} catch (Exception e) {
+
+			}
+
+			catch (Exception e) {
 				System.out.println(e);
 			}
 		}
-
 	}
 
 	public static void main(String[] args) {
@@ -224,14 +215,10 @@ public class Login extends JDialog {
 					Login dialog = new Login();
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.setVisible(true);
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
 			}
-
 		});
-
 	}
 }
