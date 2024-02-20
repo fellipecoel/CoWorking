@@ -7,8 +7,11 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 import javax.swing.JLabel;
@@ -16,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import model.DAO;
+import net.proteanit.sql.DbUtils;
 
 import javax.swing.JPasswordField;
 import javax.swing.ImageIcon;
@@ -24,6 +28,8 @@ import javax.swing.JButton;
 import java.awt.Cursor;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 public class Funcionarios extends JDialog {
 	private JTextField inputNome;
@@ -47,38 +53,44 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(nomeFunc);
 
 		JLabel loginFunc = new JLabel("Login:");
-		loginFunc.setBounds(24, 127, 46, 14);
+		loginFunc.setBounds(24, 178, 46, 14);
 		getContentPane().add(loginFunc);
 
 		JLabel senhaFunc = new JLabel("Senha:");
-		senhaFunc.setBounds(299, 127, 46, 14);
+		senhaFunc.setBounds(299, 178, 46, 14);
 		getContentPane().add(senhaFunc);
 
 		JLabel emailFunc = new JLabel("E-mail:");
-		emailFunc.setBounds(299, 200, 46, 14);
+		emailFunc.setBounds(299, 237, 46, 14);
 		getContentPane().add(emailFunc);
 
 		JLabel perfilFunc = new JLabel("Perfil:");
-		perfilFunc.setBounds(24, 200, 46, 14);
+		perfilFunc.setBounds(24, 237, 46, 14);
 		getContentPane().add(perfilFunc);
 
 		inputNome = new JTextField();
 		inputNome.setBounds(74, 55, 479, 20);
 		getContentPane().add(inputNome);
 		inputNome.setColumns(10);
+		
+		inputNome.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				buscarFuncionarioNaTabela();
+			}
+		});
 
 		inputEmail = new JTextField();
 		inputEmail.setColumns(10);
-		inputEmail.setBounds(353, 197, 200, 20);
+		inputEmail.setBounds(353, 234, 200, 20);
 		getContentPane().add(inputEmail);
 
 		inputLogin = new JTextField();
 		inputLogin.setColumns(10);
-		inputLogin.setBounds(74, 124, 200, 20);
+		inputLogin.setBounds(74, 175, 200, 20);
 		getContentPane().add(inputLogin);
 
 		inputSenha = new JPasswordField();
-		inputSenha.setBounds(353, 124, 200, 20);
+		inputSenha.setBounds(353, 175, 200, 20);
 		getContentPane().add(inputSenha);
 
 		imgCreate = new JButton("");
@@ -92,7 +104,7 @@ public class Funcionarios extends JDialog {
 				adicionarFuncionario();
 			}
 		});
-		
+
 		imgUpdate = new JButton("");
 		imgUpdate.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgUpdate.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/update.png")));
@@ -106,16 +118,25 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(imgDelete);
 
 		inputPerfil = new JComboBox();
-		inputPerfil.setModel(new DefaultComboBoxModel(new String[] {"", "Administrador", "Gerência", "Atendimento", "Suporte"}));
+		inputPerfil.setModel(
+				new DefaultComboBoxModel(new String[] { "", "Administrador", "Gerência", "Atendimento", "Suporte" }));
 		inputPerfil.setToolTipText("");
-		inputPerfil.setBounds(74, 196, 200, 22);
+		inputPerfil.setBounds(74, 233, 200, 22);
 		getContentPane().add(inputPerfil);
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(74, 75, 479, 78);
+		getContentPane().add(scrollPane);
+
+		tblFuncionarios = new JTable();
+		scrollPane.setViewportView(tblFuncionarios);
 
 	}
 
 	// Criar um objeto da classe DAO para estabelecer conexão com banco
 	DAO dao = new DAO();
 	private JComboBox inputPerfil;
+	private JTable tblFuncionarios;
 
 	private void adicionarFuncionario() {
 		String create = "insert into funcionario (nomeFunc, login, senha, perfil,  email) values (?, ?, md5(?), ?, ?);";
@@ -133,18 +154,21 @@ public class Funcionarios extends JDialog {
 			executarSQL.setString(2, inputLogin.getText());
 			executarSQL.setString(3, inputSenha.getText());
 
-			executarSQL.setString(4,inputPerfil.getSelectedItem().toString());
+			executarSQL.setString(4, inputPerfil.getSelectedItem().toString());
 
 			executarSQL.setString(5, inputEmail.getText());
 
 			// Executae os comandos SQL e inserir o funcionário no banco de dados
 			executarSQL.executeUpdate();
 
-			conexaoBanco.close();
+			JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso");
+
+			limparCampos();
 		}
 
 		catch (SQLIntegrityConstraintViolationException erro) {
 			JOptionPane.showMessageDialog(null, "Login em uso. \nEscolha outro nome de usuário.");
+
 		}
 
 		catch (Exception e) {
@@ -152,6 +176,71 @@ public class Funcionarios extends JDialog {
 		}
 
 	}
+	
+	
+	
+	
+
+	private void buscarFuncionarioNaTabela() {
+		String readTabela = "select idFuncionario as ID, nomeFunc as Nome, email as Email from funcionario "
+				+ "where nomeFunc like ?;";
+
+		try {
+			// Estabelecer a conexão
+			Connection conexaoBanco = dao.conectar();
+
+			// Preparar a execução doso comando SQL
+			PreparedStatement executarSQL = conexaoBanco.prepareStatement(readTabela);
+
+			// Subtituir o ? pelo conteúdo da caixa de texto
+			executarSQL.setString(1, inputNome.getText() + "%");
+
+			// Executar o comando SQL
+
+			ResultSet resultadoExecucao = executarSQL.executeQuery();
+
+			// Exibir o resultado na tabela, utilização da biblioteca rs2xml para "popular"
+			// a tabela
+			tblFuncionarios.setModel(DbUtils.resultSetToTableModel(resultadoExecucao));
+
+			conexaoBanco.close();
+		}
+
+		catch (Exception e) {
+			System.out.println(e);
+
+		}
+
+	}
+
+	
+	
+	
+	private void setarCaixaTexto() {
+
+		// Criar uma variável para receber a linha da tabela
+		int setarLinha = tblFuncionarios.getSelectedRow();
+
+	}
+
+	
+	
+	
+	
+	private void limparCampos() {
+		inputNome.setText(null);
+		inputLogin.setText(null);
+		inputSenha.setText(null);
+		inputEmail.setText(null);
+		// Para limpar componente JcomboBox
+		inputPerfil.setSelectedItem(null);
+		// Posicionar o cursor de volta no campo Nome
+		inputNome.requestFocus();
+	}
+	
+	
+	
+	
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
