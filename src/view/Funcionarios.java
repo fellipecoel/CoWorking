@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,6 +32,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import java.awt.Color;
 
 public class Funcionarios extends JDialog {
 	private JTextField inputNome;
@@ -69,7 +72,7 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(perfilFunc);
 
 		inputNome = new JTextField();
-		inputNome.setBounds(74, 55, 479, 20);
+		inputNome.setBounds(74, 55, 418, 20);
 		getContentPane().add(inputNome);
 		inputNome.setColumns(10);
 		
@@ -94,6 +97,8 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(inputSenha);
 
 		imgCreate = new JButton("");
+		imgCreate.setBackground(new Color(240, 240, 240));
+		imgCreate.setBorderPainted(false);
 		imgCreate.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgCreate.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/create.png")));
 		imgCreate.setBounds(304, 290, 65, 54);
@@ -106,12 +111,16 @@ public class Funcionarios extends JDialog {
 		});
 
 		imgUpdate = new JButton("");
+		imgUpdate.setBackground(new Color(240, 240, 240));
+		imgUpdate.setBorderPainted(false);
 		imgUpdate.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgUpdate.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/update.png")));
 		imgUpdate.setBounds(398, 290, 65, 54);
 		getContentPane().add(imgUpdate);
 
 		imgDelete = new JButton("");
+		imgDelete.setBackground(new Color(240, 240, 240));
+		imgDelete.setBorderPainted(false);
 		imgDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgDelete.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/delete.png")));
 		imgDelete.setBounds(488, 290, 65, 54);
@@ -125,12 +134,27 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(inputPerfil);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(74, 75, 479, 78);
+		scrollPane.setBounds(74, 75, 418, 78);
 		getContentPane().add(scrollPane);
 
 		tblFuncionarios = new JTable();
 		scrollPane.setViewportView(tblFuncionarios);
+		
+		JButton btnPesquisar = new JButton("");
+		btnPesquisar.setBackground(new Color(240, 240, 240));
+		btnPesquisar.setBorderPainted(false);
+		btnPesquisar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnPesquisar.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/search.png")));
+		btnPesquisar.setBounds(502, 55, 46, 27);
+		getContentPane().add(btnPesquisar);
 
+		
+		
+		tblFuncionarios.addMouseListener(new MouseAdapter() {
+			public void mouseClicked (MouseEvent e) {
+				setarCaixaTexto();
+			}
+		});
 	}
 
 	// Criar um objeto da classe DAO para estabelecer conexão com banco
@@ -221,9 +245,44 @@ public class Funcionarios extends JDialog {
 		// Criar uma variável para receber a linha da tabela
 		int setarLinha = tblFuncionarios.getSelectedRow();
 
+		inputNome.setText(tblFuncionarios.getModel().getValueAt(setarLinha,1).toString());
+		//inputEmail.setText(tblFuncionarios.getModel().getValueAt(setarLinha,
+		//2).toString());
 	}
 
-	
+private void btnBuscarFuncionario() {
+		
+		String readBtn = "select * from funcionario where nomeFunc = ?;";
+		
+		try {
+			
+		Connection conexaoBanco = dao.conectar();
+			
+		PreparedStatement executarSQL = conexaoBanco.prepareStatement(readBtn);
+		
+		executarSQL.setString(1, inputNome.getText());
+		
+		//Executar o comando SQL e exibir o resultado no fomulario funcionario (todos os seus dados)
+		ResultSet resultadoExecucao = executarSQL.executeQuery();
+		
+		if(resultadoExecucao.next()) {
+			//preencher os campos do formulario
+			inputLogin.setText(resultadoExecucao.getString(3));
+			inputSenha.setText(resultadoExecucao.getString(4));
+			inputPerfil.setSelectedItem(resultadoExecucao.getString(5));
+			//Propositalmete a professora não colocou o email
+			
+		}
+		
+		
+		}
+		
+		catch (Exception e) {
+			System.out.println(e);
+			
+		}
+		
+	}
 	
 	
 	
