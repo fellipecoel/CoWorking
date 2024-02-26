@@ -178,7 +178,30 @@ public class Funcionarios extends JDialog {
 
 	private void adicionarFuncionario() {
 		String create = "insert into funcionario (nomeFunc, login, senha, perfil,  email) values (?, ?, md5(?), ?, ?);";
+		
+			// Validação do login do usuário
+			if (inputNome.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(null, "Nome do funcionario obrigatório!");
+				inputNome.requestFocus();
+			}
 
+			// Validação da senha do usuário
+			else if (inputSenha.getPassword().length == 0) {
+				JOptionPane.showMessageDialog(null, "Senha do funcionario obrigatória!");
+				inputSenha.requestFocus();
+			}
+			
+			else if (inputEmail.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(null, "E-mail do funcionario obrigatório!");
+				inputEmail.requestFocus();
+			}
+			
+			else if (inputLogin.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(null, "Login do funcionario obrigatório!");
+				inputLogin.requestFocus();
+			}
+			else {
+		
 		try {
 			// Estabelecer a conexão
 			Connection conexaoBanco = dao.conectar();
@@ -211,6 +234,8 @@ public class Funcionarios extends JDialog {
 
 		catch (Exception e) {
 			System.out.println(e);
+		}
+		
 		}
 
 	}
@@ -320,6 +345,34 @@ private void btnBuscarFuncionario() {
 	private void atualizar() {
 		String updateBtn = "update funcionario set nomeFunc = ?, login = ?, senha = md5(?), perfil = ?, email = ? where idFuncionario = ?;";
  
+
+		
+		// Validação do login do usuário
+		if (inputNome.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Nome do funcionario obrigatório!");
+			inputNome.requestFocus();
+		}
+
+		// Validação da senha do usuário
+		else if (inputSenha.getPassword().length == 0) {
+			JOptionPane.showMessageDialog(null, "Senha do funcionario obrigatória!");
+			inputSenha.requestFocus();
+		}
+		
+		else if (inputEmail.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "E-mail do funcionario obrigatório!");
+			inputEmail.requestFocus();
+		}
+		
+		else if (inputLogin.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Login do funcionario obrigatório!");
+			inputLogin.requestFocus();
+		}
+		
+		
+		else {
+	
+		
 		try {
  
 			Connection conexaoBanco = dao.conectar();
@@ -351,7 +404,7 @@ private void btnBuscarFuncionario() {
 			System.out.println(e);
  
 		}
- 
+		}
 	}
  
 
